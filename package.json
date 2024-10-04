@@ -1,0 +1,45 @@
+{
+  "name": "dt-scss",
+  "version": "0.1.0",
+  "description": "Simple package to create discord themes using SCSS",
+  "type": "module",
+  "keywords": [
+    "dt-scss",
+    "betterdiscord",
+    "vencord",
+    "sass",
+    "scss"
+  ],
+  "bin": {
+    "dt-scss": "dist/index.js"
+  },
+  "author": {
+    "name": "0xJWLabs",
+    "email": "0xJWLabs@gmail.com"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "url": "https://github.com/DiscordStyler/dt-scss.git",
+    "type": "git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "npx tsc",
+    "dev": "npx tsc -w"
+  },
+  "dependencies": {
+    "ansis": "^3.3.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "sade": "^1.8.1",
+    "sass": "^1.79.4"
+  },
+  "devDependencies": {
+    "@types/find-config": "^1.0.4",
+    "@types/node": "^22.7.4",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.2"
+  }
+}
