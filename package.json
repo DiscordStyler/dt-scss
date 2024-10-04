@@ -1,6 +1,6 @@
 {
   "name": "dt-scss",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Simple package to create discord themes using SCSS",
   "type": "module",
   "keywords": [
@@ -11,7 +11,7 @@
     "scss"
   ],
   "bin": {
-    "dt-scss": "dist/index.js"
+    "dt-scss": "lib/index.js"
   },
   "author": {
     "name": "0xJWLabs",
