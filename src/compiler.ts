@@ -13,7 +13,8 @@ import { performance } from 'perf_hooks';
 import type { CompilerOptions } from './types.js';
 
 export default async (options: CompilerOptions) => {
-  const { config, mode, target, output } = options;
+  const { config, mode, output } = options;
+  let { target } = options;
   const { meta } = config;
   const missingMeta = getMissingMeta(meta);
   const DEFAULTS = await CREATE_DEFAULTS(config);

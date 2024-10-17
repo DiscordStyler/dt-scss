@@ -1,7 +1,7 @@
 import path from 'path';
 import * as log from './log.js';
 
-import type { Config } from './config.js';
+import type { ExtendedConfig } from './types.js';
 
 /**
  * Get the current OS.
@@ -22,7 +22,8 @@ export const getConfig = async (themeName?: string, sourceDir: string = 'themes'
   const find = themeName ? path.join(process.cwd(), sourceDir, themeName, 'dt-scss.config.js') : path.join(process.cwd(), 'dt-scss.config.js');
 
   try {
-    let config = (await import((getOs() === 'WIN' ? 'file://' : '') + find)).default as Config;
+    let config = (await import((getOs() === 'WIN' ? 'file://' : '') + find)).default as ExtendedConfig;
+    config.source = themeName ? `${sourceDir}/${themeName}` : ""
     return config;
   } catch (err) {
     log.error(
@@ -35,7 +36,7 @@ export const getConfig = async (themeName?: string, sourceDir: string = 'themes'
 /**
  * Construct the meta given by the `dt-scss.config.js` file.
  */
-export const generateMeta = async (config: Config) => {
+export const generateMeta = async (config: ExtendedConfig) => {
   return `/**\n${Object.entries(config.meta)
     .map(([key, value]) => ` * @${key} ${value}\n`)
     .join('')}*/\n\n`;

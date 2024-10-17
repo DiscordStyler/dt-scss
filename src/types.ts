@@ -108,9 +108,13 @@ export interface Config {
   baseImport?: string;
 }
 
+export interface ExtendedConfig extends Config {
+  source: string;
+}
+
 export interface CompilerOptions {
   target: string;
   output: string;
   mode?: 'dist' | 'addon';
-  config: Config;
+  config: ExtendedConfig;
 }
