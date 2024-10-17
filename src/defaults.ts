@@ -1,4 +1,4 @@
-import type { Config } from './config.js';
+import type { Config } from './types.js';
 
 export const CREATE_DEFAULTS = async function (config: Config) {
   return {

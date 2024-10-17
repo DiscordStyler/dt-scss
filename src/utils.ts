@@ -1,5 +1,5 @@
 import path from 'path';
-import log from './log.js';
+import * as log from './log.js';
 
 import type { Config } from './config.js';
 

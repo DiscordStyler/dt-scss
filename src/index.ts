@@ -5,7 +5,7 @@ import sade from 'sade';
 import compile from './compiler.js';
 import { getConfig, getPath } from './utils.js';
 import { CREATE_DEFAULTS } from './defaults.js';
-import log from './log.js';
+import * as log from './log.js';
 
 const prog = sade('build-theme');
 

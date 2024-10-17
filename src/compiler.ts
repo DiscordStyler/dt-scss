@@ -7,60 +7,72 @@ import autoprefixer from 'autoprefixer';
 
 import { generateMeta, getMissingMeta, getSlash } from './utils.js';
 import { CREATE_DEFAULTS } from './defaults.js';
-import log from './log.js';
+import * as log from './log.js';
 
 import { performance } from 'perf_hooks';
-import type { Config } from './config.js';
+import type { CompilerOptions } from './types.js';
 
-interface Options {
-  target: string;
-  output: string;
-  mode?: 'dist' | 'addon';
-  config: Config;
-}
-
-export default async (options: Options) => {
-  const config = options.config;
+export default async (options: CompilerOptions) => {
+  const { config, mode, target, output } = options;
   const { meta } = config;
   const missingMeta = getMissingMeta(meta);
-  const DEFAULTS = await CREATE_DEFAULTS(config!);
+  const DEFAULTS = await CREATE_DEFAULTS(config);
 
   if (!meta) log.error(`Your ${log.code('theme.config.js')} file is missing the ${log.code('meta')} object.`);
   if (missingMeta.length > 0) log.error(`Your ${log.code('meta')} object is missing the following requires properties:\n` + missingMeta);
   const startTime = performance.now();
-  const isTheme = options.mode === 'dist' || false;
+  const isTheme = mode === 'dist' || false;
   const fileName =
-    options.mode !== 'addon'
+    mode !== 'addon'
       ? `${config?.fileName || config?.meta.name}${isTheme ? '.theme' : ''}.css`
-      : options.output.split(getSlash).pop()!;
-  const dirPath = options.output
+      : output.split(getSlash).pop()!;
+  const dirPath = output
     .split(getSlash)
     .filter((el) => !el.endsWith('.css'))
     .join(getSlash);
 
   // // Check if target file exists.
-  if (!fs.existsSync(options.target)) log.error(`Cannot find the target file ${log.code(options.target)}`);
+  if (!fs.existsSync(target)) log.error(`Cannot find the target file ${log.code(target)}`);
 
-  log.info(`Building ${log.code(options.target)} file...`);
+  log.info(`Building ${log.code(target)} file...`);
 
   // Check if path exists, if not make it.
   if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
 
   // Compile and parse css.
-  const css = sass.compile(options.target, {
-    charset: false,
-    loadPaths: ['node_modules']
-  }).css;
+  let css;
+  try {
+    css = sass.compile(target, {
+      charset: false,
+      loadPaths: ['node_modules'],
+    }).css;
+  } catch (err: any) {
+    log.error(`Sass compilation failed: ${err.message}`);
+    return;
+  }
 
-  const postcss = new Processor([autoprefixer]).process(css);
-  const parsedcss = postcss.css;
+  let parsedcss;
+  try {
+    const postcss = new Processor([autoprefixer]).process(css);
+    parsedcss = postcss.css;
+  } catch(err: any) {
+    log.error(`PostCSS processing failed: ${err.message}`);
+  }
 
   let generatedFile: string | undefined = '';
 
   if (isTheme) {
-    generatedFile = await generateMeta(config!);
-    if (options.mode === 'dist') generatedFile += `@import url('${options.config.baseImport || DEFAULTS.baseImport}');\n\n`;
+    try {
+      generatedFile = await generateMeta(config);
+      if (mode == "dist") {
+        generatedFile += `@import url('${config.baseImport || DEFAULTS.baseImport}');\n\n`;
+      }
+    } catch(err: any) {
+      log.error(`Failed to generate meta: ${err.message}`);
+      return
+    }
   }
+
   generatedFile += parsedcss;
 
   const endTime = performance.now();
@@ -72,7 +84,11 @@ export default async (options: Options) => {
 
   // Write file to disk.
   try {
-    fs.writeFileSync(path.join(dirPath, fileName.replace(/ /g, '')), generatedFile);
+    fs.writeFile(path.join(dirPath, fileName.replace(/ /g, '')), generatedFile, err => {
+      if (err) {
+        console.error(err);
+      }
+    });
     log.success(`Built in ${(endTime - startTime).toFixed()}ms`);
   } catch (error) {
     log.error(error);
