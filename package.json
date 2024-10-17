@@ -1,6 +1,6 @@
 {
   "name": "dt-scss",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Simple package to create discord themes using SCSS",
   "type": "module",
   "keywords": [
